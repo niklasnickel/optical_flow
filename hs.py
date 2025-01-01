@@ -21,12 +21,10 @@ feature_params = dict(maxCorners=FEATURES,
 					  minDistance=7,
 					  blockSize=7)
 
-# Parameters for lucas kanade optical flow
-lk_params = dict(winSize=(15, 15),
-				 maxLevel=2,
-				 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+# Parameters for Farneback optical flow
+hs_params = dict(pyr_scale=0.5, levels=3, winsize=15, iterations=3, poly_n=5, poly_sigma=1.2, flags=0)
 
-vidPath = "data/data/bamboo_1/clean.mp4"
+vidPath = "data/bamboo_1/clean.mp4"
 output_video_file = "output_video.mp4"
 
 cap = cv2.VideoCapture(vidPath)
@@ -58,32 +56,33 @@ while (1):
 
 	# calculate optical flow
 	t = time.perf_counter()
-	p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+	flow = cv2.calcOpticalFlowFarneback(old_gray, frame_gray, None, **hs_params)
 	etime += (time.perf_counter() - t)
 
-	# Select good points
-	good_new = p1[st == 1]
-	good_old = p0[st == 1]
+	# Compute the magnitude and angle of the flow
+	mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
 
-	# draw the tracks
-	for i, (new, old) in enumerate(zip(good_new, good_old)):
-		a, b = new.astype('int').ravel()
-		c, d = old.astype('int').ravel()
-		mask = cv2.line(mask, (a, b), (c, d), color[i].tolist(), 2)
-		frame = cv2.circle(frame, (a, b), 5, color[i].tolist(), -1)
-	img = cv2.add(frame, mask)
+	# Create an HSV image
+	hsv = np.zeros_like(old_frame)
+	hsv[..., 1] = 255
+
+	# Set the hue and value according to the flow
+	hsv[..., 0] = ang * 180 / np.pi / 2
+	hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+
+	# Convert HSV to BGR
+	bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
 	# Write the frame to the output video
-	out.write(img)
+	out.write(bgr)
 
-	cv2.imshow('frame', img)
+	cv2.imshow('frame', bgr)
 	k = cv2.waitKey(30) & 0xff
 	if k == 27:
 		break
 
-	# Now update the previous frame and previous points
+	# Now update the previous frame
 	old_gray = frame_gray.copy()
-	p0 = good_new.reshape(-1, 1, 2)
 
 cv2.destroyAllWindows()
 cap.release()
