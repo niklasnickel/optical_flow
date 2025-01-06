@@ -2,16 +2,9 @@ import time
 
 import cv2
 import numpy as np
-from IPython.core.display import display, HTML
 
 print("Installed opencv version", cv2.__version__)
 print("Installed numpy version", np.__version__)
-
-display(HTML("<style>"
-			 + "#notebook { padding-top:0px !important; } "
-			 + ".container { width:100% !important; } "
-			 + ".end_space { min-height:0px !important; } "
-			 + "</style>"))
 
 FEATURES = 100
 
@@ -50,7 +43,7 @@ p0 = cv2.goodFeaturesToTrack(old_gray, mask=None, **feature_params)
 # Create a mask image for drawing purposes
 mask = np.zeros_like(old_frame)
 etime = 0
-while (1):
+while 1:
 	ret, frame = cap.read()
 	if frame is None:
 		break

@@ -2,24 +2,11 @@ import time
 
 import cv2
 import numpy as np
-from IPython.core.display import display, HTML
 
 print("Installed opencv version", cv2.__version__)
 print("Installed numpy version", np.__version__)
 
-display(HTML("<style>"
-			 + "#notebook { padding-top:0px !important; } "
-			 + ".container { width:100% !important; } "
-			 + ".end_space { min-height:0px !important; } "
-			 + "</style>"))
-
-FEATURES = 100
-
-# params for ShiTomasi corner detection
-feature_params = dict(maxCorners=FEATURES,
-					  qualityLevel=0.3,
-					  minDistance=7,
-					  blockSize=7)
+### Horn-Schunck Optical Flow ###
 
 # Parameters for Farneback optical flow
 hs_params = dict(pyr_scale=0.5, levels=3, winsize=15, iterations=3, poly_n=5, poly_sigma=1.2, flags=0)
@@ -37,18 +24,14 @@ frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 out = cv2.VideoWriter(output_video_file, fourcc, 30.0, (frame_width, frame_height))
 
-# Create some random colors
-color = np.random.randint(0, 255, (FEATURES, 3))
-
 # Take first frame and find corners in it
 ret, old_frame = cap.read()
 old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
-p0 = cv2.goodFeaturesToTrack(old_gray, mask=None, **feature_params)
 
 # Create a mask image for drawing purposes
 mask = np.zeros_like(old_frame)
 etime = 0
-while (1):
+while 1:
 	ret, frame = cap.read()
 	if frame is None:
 		break
