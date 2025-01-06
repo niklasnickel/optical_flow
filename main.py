@@ -7,15 +7,19 @@ print("Installed numpy version", np.__version__)
 FEATURES = 100
 
 # params for ShiTomasi corner detection
-feature_params = dict(maxCorners=FEATURES,
-					  qualityLevel=0.3,
-					  minDistance=20,
-					  blockSize=7)
+feature_params = dict(
+	maxCorners=FEATURES,
+	qualityLevel=0.3,
+	minDistance=20,
+	blockSize=7
+)
 
 # Parameters for lucas kanade optical flow
-lk_params = dict(winSize=(30, 30),
-				 maxLevel=0,
-				 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+lk_params = dict(
+	winSize=(30, 30),
+	maxLevel=0,
+	criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03)
+)
 
 vidPath = "data/level_1.mp4"
 output_video_file = "output_video.mp4"

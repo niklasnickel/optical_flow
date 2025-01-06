@@ -7,7 +7,15 @@ print("Installed numpy version", np.__version__)
 ### Horn-Schunck Optical Flow ###
 
 # Parameters for Farneback optical flow
-hs_params = dict(pyr_scale=0.5, levels=4, winsize=15, iterations=6, poly_n=5, poly_sigma=1.2, flags=0)
+hs_params = dict(
+	pyr_scale=0.5,
+	levels=4,
+	winsize=15,
+	iterations=6,
+	poly_n=5,
+	poly_sigma=1.2,
+	flags=0
+)
 
 vidPath = "testing_data/bamboo_1/clean.mp4"
 output_video_file = "output_video.mp4"
