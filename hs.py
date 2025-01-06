@@ -1,5 +1,3 @@
-import time
-
 import cv2
 import numpy as np
 
@@ -9,9 +7,9 @@ print("Installed numpy version", np.__version__)
 ### Horn-Schunck Optical Flow ###
 
 # Parameters for Farneback optical flow
-hs_params = dict(pyr_scale=0.5, levels=3, winsize=15, iterations=3, poly_n=5, poly_sigma=1.2, flags=0)
+hs_params = dict(pyr_scale=0.5, levels=4, winsize=15, iterations=6, poly_n=5, poly_sigma=1.2, flags=0)
 
-vidPath = "data/bamboo_1/clean.mp4"
+vidPath = "testing_data/bamboo_1/clean.mp4"
 output_video_file = "output_video.mp4"
 
 cap = cv2.VideoCapture(vidPath)
@@ -38,9 +36,7 @@ while 1:
 	frame_gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
 	# calculate optical flow
-	t = time.perf_counter()
 	flow = cv2.calcOpticalFlowFarneback(old_gray, frame_gray, None, **hs_params)
-	etime += (time.perf_counter() - t)
 
 	# Compute the magnitude and angle of the flow
 	mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
@@ -60,9 +56,6 @@ while 1:
 	out.write(bgr)
 
 	cv2.imshow('frame', bgr)
-	k = cv2.waitKey(30) & 0xff
-	if k == 27:
-		break
 
 	# Now update the previous frame
 	old_gray = frame_gray.copy()

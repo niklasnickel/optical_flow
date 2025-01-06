@@ -1,5 +1,3 @@
-import time
-
 import cv2
 import numpy as np
 
@@ -11,15 +9,15 @@ FEATURES = 100
 # params for ShiTomasi corner detection
 feature_params = dict(maxCorners=FEATURES,
 					  qualityLevel=0.3,
-					  minDistance=7,
+					  minDistance=20,
 					  blockSize=7)
 
 # Parameters for lucas kanade optical flow
-lk_params = dict(winSize=(15, 15),
-				 maxLevel=2,
+lk_params = dict(winSize=(30, 30),
+				 maxLevel=0,
 				 criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
-vidPath = "data/data/bamboo_1/clean.mp4"
+vidPath = "data/level_1.mp4"
 output_video_file = "output_video.mp4"
 
 cap = cv2.VideoCapture(vidPath)
@@ -50,9 +48,7 @@ while 1:
 	frame_gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
 	# calculate optical flow
-	t = time.perf_counter()
 	p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
-	etime += (time.perf_counter() - t)
 
 	# Select good points
 	good_new = p1[st == 1]
@@ -70,9 +66,6 @@ while 1:
 	out.write(img)
 
 	cv2.imshow('frame', img)
-	k = cv2.waitKey(30) & 0xff
-	if k == 27:
-		break
 
 	# Now update the previous frame and previous points
 	old_gray = frame_gray.copy()

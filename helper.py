@@ -78,11 +78,11 @@ def convert_flow_sequence_to_video(flow_folder, video_file):
 
 
 # Directory containing the image sequence
-image_folder = 'data/bamboo_1'
-flow_folder = 'data/bamboo_1/flow'
+image_folder = 'MPI-Sintel-complete/training/clean/bamboo_2'
+flow_folder = 'MPI-Sintel-complete/training/flow/bamboo_2'
 
 # Output video file
-video_file = 'data/bamboo_1/flow.mp4'
+video_file = 'testing_data/bamboo_2/flow.mp4'
 
 # convert_img_sequence_to_video(image_folder, video_file)
 convert_flow_sequence_to_video(flow_folder, video_file)
