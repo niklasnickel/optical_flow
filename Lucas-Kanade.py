@@ -21,12 +21,12 @@ feature_params = dict(
 	maxCorners=FEATURES,  # Maximum number of features to track
 	qualityLevel=0.3,  # Minimal eigenvalue of the feature matrix
 	minDistance=20,  # Minimum distance between features
-	blockSize=7  # Dimension of the search matrix W
+	blockSize=7  # Dimension of the search matrix W (used for feature selection)
 )
 
 # Parameters for Lucas-Kanade optical flow
 lk_params = dict(
-	winSize=(30, 30),  # Dimension of the search matrix W
+	winSize=(30, 30),  # Dimension of the search matrix W (used for optical flow detection)
 	maxLevel=3,  # Maximum pyramid level
 	criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03)  # Convergence criteria
 )
@@ -87,7 +87,10 @@ while 1:
 	# Write the frame to the output video
 	out.write(img)
 
-	cv2.imshow('frame', img)
+	cv2.imshow('Lucas-Kanade Optical Flow', img)
+
+	if cv2.waitKey(1) & 0xFF == 27:  # Press 'Esc' to exit
+		break  # This line is necessary to display the frame during calculation
 
 	# Now update the previous frame and previous points
 	old_gray = frame_gray.copy()

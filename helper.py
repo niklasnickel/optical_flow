@@ -64,7 +64,8 @@ def convert_flow_sequence_to_video(flow_folder, video_file):
 
 		# Set the hue and value according to the flow
 		hsv[..., 0] = ang * 180 / np.pi / 2
-		hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
+		hsv[..., 2] = 20 * mag
+		# hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
 
 		# Convert HSV to BGR
 		bgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
@@ -77,12 +78,84 @@ def convert_flow_sequence_to_video(flow_folder, video_file):
 	cv2.destroyAllWindows()
 
 
+def count_frames(video_path):
+	cap = cv2.VideoCapture(video_path)
+	if not cap.isOpened():
+		print(f"Error: Could not open video {video_path}")
+		return 0
+
+	frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+	cap.release()
+	return frame_count
+
+
+def compute_video_differences(video_path1, video_path2, output_video_path):
+	cap1 = cv2.VideoCapture(video_path1)
+	cap2 = cv2.VideoCapture(video_path2)
+
+	if not cap1.isOpened() or not cap2.isOpened():
+		print("Error: Could not open one of the video files.")
+		return
+
+	# Get the width and height of the frames
+	frame_width = int(cap1.get(cv2.CAP_PROP_FRAME_WIDTH))
+	frame_height = int(cap1.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+	# Define the codec and create VideoWriter object
+	fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+	out = cv2.VideoWriter(output_video_path, fourcc, 30.0, (frame_width, frame_height))
+
+	average_epe = []
+
+	while True:
+		ret1, frame1 = cap1.read()
+		ret2, frame2 = cap2.read()
+
+		if not ret1 or not ret2:
+			break
+
+		frame1_hsv = cv2.cvtColor(frame1, cv2.COLOR_BGR2HSV)
+		frame2_hsv = cv2.cvtColor(frame2, cv2.COLOR_BGR2HSV)
+
+		frame_1_x = frame1_hsv[:, :, 2] * np.cos(frame1_hsv[:, :, 0] / 255)
+		frame_1_y = frame1_hsv[:, :, 2] * np.sin(frame1_hsv[:, :, 0] / 255)
+
+		frame_2_x = frame2_hsv[:, :, 2] * np.cos(frame2_hsv[:, :, 0] / 255)
+		frame_2_y = frame2_hsv[:, :, 2] * np.sin(frame2_hsv[:, :, 0] / 255)
+
+		epe = np.sqrt((frame_1_x - frame_2_x) ** 2 + (frame_1_y - frame_2_y) ** 2)
+
+		# Compute the absolute difference between the frames
+		diff = cv2.absdiff(frame1, frame2)
+
+		# Write the frame to the output video
+		out.write(diff)
+
+		# Display the resulting frame
+		cv2.imshow('Difference', diff)
+
+		average_epe.append(np.mean(epe) / 20)
+
+	cap1.release()
+	cap2.release()
+	out.release()
+	cv2.destroyAllWindows()
+
+	return np.mean(average_epe)
+
+
 # Directory containing the image sequence
 image_folder = 'MPI-Sintel-complete/training/clean/bamboo_2'
-flow_folder = 'MPI-Sintel-complete/training/flow/bamboo_2'
+flow_folder = 'MPI-Sintel-complete/training/flow/bamboo_1'
 
 # Output video file
-video_file = 'testing_data/bamboo_2/flow.mp4'
+video_file = 'testing_data/bamboo_1/flow.mp4'
 
 # convert_img_sequence_to_video(image_folder, video_file)
-convert_flow_sequence_to_video(flow_folder, video_file)
+# convert_flow_sequence_to_video(flow_folder, video_file)
+
+test_video_path = "output_video.mp4"
+validation_video_path = "data/level_3-solution.mp4"
+
+error = compute_video_differences(test_video_path, validation_video_path, "output_video_diff.mp4")
+print(error)
