@@ -35,7 +35,7 @@ params = dict(
 # Preparation
 #####################
 
-vidPath = "testing_data/bamboo_1/clean.mp4"
+vidPath = "data/level_3.mp4"
 output_video_file = "output_video.mp4"
 validation_video_path = "data/level_3-solution.mp4"
 

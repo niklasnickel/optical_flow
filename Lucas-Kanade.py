@@ -27,7 +27,7 @@ feature_params = dict(
 # Parameters for Lucas-Kanade optical flow
 lk_params = dict(
 	winSize=(30, 30),  # Dimension of the search matrix W (used for optical flow detection)
-	maxLevel=3,  # Maximum pyramid level
+	maxLevel=1,  # Maximum pyramid level
 	criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03)  # Convergence criteria
 )
 
@@ -35,7 +35,7 @@ lk_params = dict(
 # Preparation
 #####################
 
-vidPath = "data/level_2.mp4"
+vidPath = "data/level_1.mp4"
 output_video_file = "output_video.mp4"
 
 cap = cv2.VideoCapture(vidPath)
